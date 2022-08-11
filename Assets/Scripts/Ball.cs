@@ -26,6 +26,9 @@ public class Ball : MonoBehaviour
             case GameManager.Mode.Play:
                 break;
 
+            case GameManager.Mode.GameOver:
+                break;
+
             default:
                 transform.position = new Vector2(paddle.position.x, paddle.position.y + .3f);   //keep the ball on the paddle and move it around
 
@@ -53,9 +56,12 @@ public class Ball : MonoBehaviour
 		switch(other.tag)
 		{
             case "Bottom":
-                manager.UpdateLives(manager.GetLives -1);           //lose a life
-                body.AddForce(Vector2.zero);                        //stop the force
-                manager.ChangeMode(GameManager.Mode.Move);      //move it to the paddle
+                if (manager.CurrentMode != GameManager.Mode.GameOver)
+                {
+                    body.AddForce(Vector2.zero);                        //stop the force
+                    manager.ChangeMode(GameManager.Mode.Move);          //move it to the paddle
+                    manager.UpdateLives(manager.GetLives - 1);           //lose a life
+                }
                 break;
 		}
 	}

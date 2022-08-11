@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -11,6 +12,8 @@ public class GameManager : MonoBehaviour
 	private float curTime;
 	int numBricks;
 
+	[SerializeField]
+	GameObject gameOverPanel;
 	[SerializeField]
 	Text livesLabel;
 	[SerializeField]
@@ -27,35 +30,43 @@ public class GameManager : MonoBehaviour
 		None,
 		Play,
 		Move,
-		Pause
+		Pause,
+		GameOver
 	}
 
 	void Start()
 	{
 		ChangeMode(Mode.Pause);
 		SetDefaultUI();
+
 		var temp = GameObject.FindObjectsOfType<Brick>();
 		numBricks = temp.Length;
+
+		gameOverPanel.SetActive(false);
 	}
 
 	public void ChangeMode(Mode newMode)
 	{
 		curMode = newMode;
+
+		if (curMode == Mode.GameOver)
+			GameOver();
 	}
 
-	private void Update()
+	void GameOver()
 	{
-		switch(curMode)
-		{
-			case Mode.Pause:
-				break;
+		gameOverPanel.SetActive(true);
+	}
 
-			default:
-				curTime += Time.deltaTime;
-				int minutes = Mathf.FloorToInt(curTime / 60F);
-				timeLabel.text = string.Format("Tmie: {0:0}:{1:00}", minutes, curTime - minutes * 60);
-				break;
-		}
+	public void PlayAgain()
+	{
+		SceneManager.LoadScene("SampleScene");
+	}
+
+	public void Quit()
+	{
+		Application.Quit();
+		Debug.Log("Good-bye!");
 	}
 
 	private void SetDefaultUI()
@@ -64,14 +75,33 @@ public class GameManager : MonoBehaviour
 		livesLabel.text = "Lives: " + lives.ToString();
 	}
 
+	private void Update()
+	{
+		switch (curMode)
+		{
+			case Mode.Pause:
+				break;
+
+			case Mode.GameOver:
+				break;
+
+			default:
+				curTime += Time.deltaTime;
+				int minutes = Mathf.FloorToInt(curTime / 60F);
+				timeLabel.text = string.Format("Time: {0:0}:{1:00}", minutes, curTime - minutes * 60);
+				break;
+		}
+	}
+
 	public void UpdateLives(int newLifeAmount)
 	{
 		lives = newLifeAmount;
-		if(lives < 1)
-		{
-			Debug.Log("End the game here");
-		}
 		livesLabel.text = "Lives: " + lives.ToString();
+		if (lives < 1)
+		{
+			lives = 0;
+			ChangeMode(Mode.GameOver);
+		}
 	}
 
 	public void UpdateScore(int amount)
