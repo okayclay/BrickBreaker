@@ -1,12 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Assets.Scripts;
 
 public class Ball : MonoBehaviour
 {
     Rigidbody2D body;
     Transform paddle;
+    GameManager manager;
     [SerializeField]
     float speed;
     [SerializeField]
@@ -21,9 +21,9 @@ public class Ball : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        switch(Engine.CurrentMode)
+        switch(manager.CurrentMode)
 		{
-            case Engine.Mode.Play:
+            case GameManager.Mode.Play:
                 break;
 
             default:
@@ -31,7 +31,7 @@ public class Ball : MonoBehaviour
 
                 if (Input.GetButtonDown("Jump"))
                 {
-                    Engine.ChangeMode(Engine.Mode.Play);
+                    manager.ChangeMode(GameManager.Mode.Play);
                     body.AddForce(Vector2.up * speed);
                 }
                 break;
@@ -41,7 +41,11 @@ public class Ball : MonoBehaviour
     void setUp()
 	{
         body = transform.GetComponent<Rigidbody2D>();
+        Debug.Log("Rigidbody Found: " + (body != null));
         paddle = GameObject.FindGameObjectWithTag("Paddle").transform;
+        Debug.Log("Paddle found: " + (paddle != null));
+        manager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        Debug.Log("Game Manager found: " + (manager != null));
     }
 
 	private void OnTriggerEnter2D(Collider2D other)
@@ -49,9 +53,9 @@ public class Ball : MonoBehaviour
 		switch(other.tag)
 		{
             case "Bottom":
-                Debug.Log("LOSE A LIFE");
-                body.AddForce(Vector2.zero);            //stop the force
-                Engine.ChangeMode(Engine.Mode.Move);    //move it to the paddle
+                manager.UpdateLives(manager.GetLives -1);           //lose a life
+                body.AddForce(Vector2.zero);                        //stop the force
+                manager.ChangeMode(GameManager.Mode.Move);      //move it to the paddle
                 break;
 		}
 	}
@@ -61,16 +65,17 @@ public class Ball : MonoBehaviour
 		switch(collision.gameObject.tag)
 		{
             case "Brick":
-                StartCoroutine(RemoveBrick(collision.transform));
+                StartCoroutine(HitBrick(collision.transform));
                 break;
 		}
 	}
 
-    IEnumerator RemoveBrick(Transform brick)
+    IEnumerator HitBrick(Transform brick)
 	{
+        manager.UpdateScore(brick.GetComponent<Brick>().Points);
         Transform explosion = Instantiate(explosionParticle, brick.position, Quaternion.identity);
         Destroy(brick.gameObject);  //no more brick
         yield return new WaitForSeconds(2);
-        Destroy(explosion.gameObject);
+        Destroy(explosion.gameObject);  //clean up explosion
     }
 }
