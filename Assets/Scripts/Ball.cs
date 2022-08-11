@@ -9,6 +9,8 @@ public class Ball : MonoBehaviour
     Transform paddle;
     [SerializeField]
     float speed;
+    [SerializeField]
+    Transform explosionParticle;
 
     // Start is called before the first frame update
     void Start()
@@ -48,9 +50,27 @@ public class Ball : MonoBehaviour
 		{
             case "Bottom":
                 Debug.Log("LOSE A LIFE");
-                Engine.ChangeMode(Engine.Mode.Move);    //move it to the paddle
                 body.AddForce(Vector2.zero);            //stop the force
+                Engine.ChangeMode(Engine.Mode.Move);    //move it to the paddle
                 break;
 		}
 	}
+
+	private void OnCollisionEnter2D(Collision2D collision)
+	{
+		switch(collision.gameObject.tag)
+		{
+            case "Brick":
+                StartCoroutine(RemoveBrick(collision.transform));
+                break;
+		}
+	}
+
+    IEnumerator RemoveBrick(Transform brick)
+	{
+        Transform explosion = Instantiate(explosionParticle, brick.position, Quaternion.identity);
+        Destroy(brick.gameObject);  //no more brick
+        yield return new WaitForSeconds(2);
+        Destroy(explosion.gameObject);
+    }
 }
