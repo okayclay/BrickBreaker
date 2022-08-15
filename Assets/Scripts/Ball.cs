@@ -12,6 +12,8 @@ public class Ball : MonoBehaviour
     [SerializeField]
     Transform explosionParticle;
 
+    public float Speed {  get { return speed; } }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -26,7 +28,8 @@ public class Ball : MonoBehaviour
             case GameManager.Mode.Play:
                 break;
 
-            case GameManager.Mode.GameOver:
+            case GameManager.Mode.GameEnd:
+                ReturnToPaddle();
                 break;
 
             default:
@@ -51,16 +54,28 @@ public class Ball : MonoBehaviour
         Debug.Log("Game Manager found: " + (manager != null));
     }
 
+    void ReturnToPaddle()
+	{
+        body.velocity = Vector2.zero;                        //stop the force
+        manager.ChangeMode(GameManager.Mode.Move);          //move it to the paddle
+    }
+
 	private void OnTriggerEnter2D(Collider2D other)
 	{
 		switch(other.tag)
 		{
             case "Bottom":
-                if (manager.CurrentMode != GameManager.Mode.GameOver)
+                if (manager.CurrentMode != GameManager.Mode.GameEnd)   //Dont count multiball loses against your lives
                 {
-                    body.AddForce(Vector2.zero);                        //stop the force
-                    manager.ChangeMode(GameManager.Mode.Move);          //move it to the paddle
-                    manager.UpdateLives(manager.GetLives - 1);           //lose a life
+                    if (!transform.name.Contains("Clone"))
+                    {
+                        ReturnToPaddle();
+                        manager.UpdateLives(manager.GetLives - 1);           //lose a life
+                    }
+                    else
+					{
+                        Destroy(gameObject);
+					}
                 }
                 break;
 		}
@@ -78,6 +93,7 @@ public class Ball : MonoBehaviour
 
     IEnumerator HitBrick(Transform brick)
 	{
+        manager.BrickDestroyed(brick);
         manager.UpdateScore(brick.GetComponent<Brick>().Points);
         Transform explosion = Instantiate(explosionParticle, brick.position, Quaternion.identity);
         Destroy(brick.gameObject);  //no more brick

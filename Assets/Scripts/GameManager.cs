@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Assets.Scripts;
 
 public class GameManager : MonoBehaviour
 {
@@ -20,10 +21,13 @@ public class GameManager : MonoBehaviour
 	Text scoreLabel;
 	[SerializeField]
 	Text timeLabel;
+	[SerializeField]
+	Transform[] powerups;
 
-	public Mode CurrentMode { get { return curMode; } }
-	public int GetLives { get { return lives;} }
-	public int GetScore {  get { return score; } }
+	public Mode			CurrentMode {	get { return curMode; } }
+	public int			GetLives	{	get { return lives; } }
+	public int			GetScore	{	get { return score; } }
+	public  Transform[] Powerups	{	get { return powerups; } }
 
 	public enum Mode
 	{
@@ -31,7 +35,7 @@ public class GameManager : MonoBehaviour
 		Play,
 		Move,
 		Pause,
-		GameOver
+		GameEnd
 	}
 
 	void Start()
@@ -39,8 +43,9 @@ public class GameManager : MonoBehaviour
 		ChangeMode(Mode.Pause);
 		SetDefaultUI();
 
-		var temp = GameObject.FindObjectsOfType<Brick>();
+		var temp = GameObject.FindGameObjectsWithTag("Brick");
 		numBricks = temp.Length;
+		Debug.Log(numBricks + " found");
 
 		gameOverPanel.SetActive(false);
 	}
@@ -49,8 +54,13 @@ public class GameManager : MonoBehaviour
 	{
 		curMode = newMode;
 
-		if (curMode == Mode.GameOver)
-			GameOver();
+		if (curMode == Mode.GameEnd)
+		{
+			if (lives < 1)
+				GameOver();
+			else if (numBricks < 1)
+				GameWon();
+		}
 	}
 
 	void GameOver()
@@ -58,6 +68,33 @@ public class GameManager : MonoBehaviour
 		gameOverPanel.SetActive(true);
 	}
 
+	void GameWon()
+	{
+
+	}
+
+	public void BrickDestroyed(Transform brick)
+	{
+		numBricks--;
+		PowerupRandomizer(brick);
+		if(numBricks < 1)
+		{
+			numBricks = 0;
+			ChangeMode(Mode.GameEnd);
+		}
+	}
+
+	void PowerupRandomizer(Transform brick)
+	{
+		int chance = Random.Range(1, 11);  //max exclusive
+		int index = Random.Range(0, powerups.Length);
+
+		if (chance < 6)
+		{
+			Instantiate(powerups[index], brick.position, brick.rotation);
+		}
+	}
+	
 	public void PlayAgain()
 	{
 		SceneManager.LoadScene("SampleScene");
@@ -82,7 +119,7 @@ public class GameManager : MonoBehaviour
 			case Mode.Pause:
 				break;
 
-			case Mode.GameOver:
+			case Mode.GameEnd:
 				break;
 
 			default:
@@ -100,7 +137,7 @@ public class GameManager : MonoBehaviour
 		if (lives < 1)
 		{
 			lives = 0;
-			ChangeMode(Mode.GameOver);
+			ChangeMode(Mode.GameEnd);
 		}
 	}
 

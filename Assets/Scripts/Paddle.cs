@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Assets.Scripts;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,17 +9,23 @@ public class Paddle : MonoBehaviour
     float speed, rightBound, leftBound;
 
     GameManager manager;
+    float originalSpeed;
+
+    public float OriginalSpeed {  get { return originalSpeed; } }
+
     // Start is called before the first frame update
     void Start()
     {
         manager = GameObject.Find("GameManager").GetComponent<GameManager>();
         Debug.Log("Game Manager found: " + (manager != null));
+
+        originalSpeed = speed;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (manager.CurrentMode != GameManager.Mode.GameOver)
+        if (manager.CurrentMode != GameManager.Mode.GameEnd)
         {
             float horizontal = Input.GetAxis("Horizontal");                             //get input from the input manager every frame
             transform.Translate(Vector2.right * horizontal * Time.deltaTime * speed);   //move the paddle in the direction that we pressed
@@ -37,6 +44,22 @@ public class Paddle : MonoBehaviour
         else if (transform.position.x <= leftBound)
 		{
             transform.position = new Vector3(leftBound, transform.position.y);
+		}
+	}
+
+    public void ChangeSpeed(float newSpeed)
+	{
+        speed = newSpeed;
+	}
+
+	private void OnTriggerEnter2D(Collider2D collision)
+	{
+		switch(collision.tag)
+		{
+            case "PowerUp":
+                collision.GetComponent<Powerup>().Activate();
+                Destroy(collision.gameObject);
+                break;
 		}
 	}
 }
