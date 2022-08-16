@@ -67,7 +67,7 @@ public class Ball : MonoBehaviour
             case "Bottom":
                 if (manager.CurrentMode != GameManager.Mode.GameEnd)   //Dont count multiball loses against your lives
                 {
-                    if (!transform.name.Contains("Clone"))
+                    if (manager.NumberBalls < 2)
                     {
                         ReturnToPaddle();
                         manager.UpdateLives(manager.GetLives - 1);           //lose a life
@@ -75,6 +75,7 @@ public class Ball : MonoBehaviour
                     else
 					{
                         Destroy(gameObject);
+                        manager.NumberBalls--;
 					}
                 }
                 break;

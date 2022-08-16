@@ -57,7 +57,7 @@ public class Paddle : MonoBehaviour
 		switch(collision.tag)
 		{
             case "PowerUp":
-                collision.GetComponent<Powerup>().Activate();
+                collision.GetComponent<Powerup>().Activate(collision.transform.position);
                 Destroy(collision.gameObject);
                 break;
 		}

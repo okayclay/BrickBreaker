@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,21 +13,26 @@ namespace Assets.Scripts
 		[SerializeField]
 		float timeActivatedLeft = 0;
 
+		static GameObject ball;
+
 		GameManager manager;
 		Paddle paddle;
+		Vector3 pos;
 
 		bool activated = false;
 		bool complete = false;
 
 		private void Start()
 		{
+			ball = Resources.Load("Ball", typeof(GameObject)) as GameObject;
 			manager = GameObject.Find("GameManager").GetComponent<GameManager>();
 			paddle = GameObject.FindGameObjectWithTag("Paddle").GetComponent<Paddle>();
 		}
 
-		public void Activate()
+		public void Activate(Vector3 position)
 		{
 			activated = true;
+			pos = position;
 
 			if (transform.name.ToLower().Contains("extra life"))
 			{
@@ -34,16 +40,11 @@ namespace Assets.Scripts
 			}
 			else if (transform.name.ToLower().Contains("multiball"))
 			{
-				GameObject ball;
-				for (int i = 0; i < 2; i++)	//TO DO: Change how they are moved 
-				{
-					ball = Instantiate(Resources.Load("Ball", typeof(GameObject))) as GameObject;
-					ball.GetComponent<Rigidbody2D>().AddForce(Vector2.up * ball.GetComponent<Ball>().Speed);
-				}
+				StartCoroutine(Wait());
 			}
 			else if (transform.name.ToLower().Contains("speed up"))
 			{
-				paddle.ChangeSpeed(paddle.OriginalSpeed * 1.5f);
+				paddle.ChangeSpeed(paddle.OriginalSpeed * 2f);
 			}
 		}
 
@@ -51,14 +52,23 @@ namespace Assets.Scripts
 		{
 			complete = true;
 
-			if (transform.name.ToLower().Contains("multiball"))
-			{
-
-			}
-			else if (transform.name.ToLower().Contains("speed up"))
+			if (transform.name.ToLower().Contains("speed up"))
 			{
 				paddle.ChangeSpeed(paddle.OriginalSpeed);
 			}
+		}
+
+		void Multiball()
+		{
+			Instantiate(ball, pos, Quaternion.identity).GetComponent<Rigidbody2D>().AddForce(Vector2.down * ball.GetComponent<Ball>().Speed);
+			manager.NumberBalls++;
+		}
+
+		IEnumerator Wait()
+		{
+			Multiball();
+			yield return new WaitForSeconds(1.5f);
+			Multiball();		
 		}
 
 		void Update()
@@ -68,6 +78,16 @@ namespace Assets.Scripts
 
 			if (timeActivatedLeft <= 0)
 				Deactivate();
+		}
+
+		private void OnTriggerEnter2D(Collider2D other)
+		{
+			switch (other.tag)
+			{
+				case "Bottom":
+					Destroy(gameObject);
+					break;
+			}
 		}
 	}
 }

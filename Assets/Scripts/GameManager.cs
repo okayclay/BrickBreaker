@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
 	private Mode curMode;
 	private float curTime;
 	int numBricks;
+	int numBalls = 1;
 
 	[SerializeField]
 	GameObject gameOverPanel;
@@ -28,6 +29,7 @@ public class GameManager : MonoBehaviour
 	public int			GetLives	{	get { return lives; } }
 	public int			GetScore	{	get { return score; } }
 	public  Transform[] Powerups	{	get { return powerups; } }
+	public int			NumberBalls {	get { return numBalls; } set { numBalls = value; } }
 
 	public enum Mode
 	{
@@ -120,12 +122,13 @@ public class GameManager : MonoBehaviour
 				break;
 
 			case Mode.GameEnd:
+				Time.timeScale = 0;
 				break;
 
 			default:
 				curTime += Time.deltaTime;
 				int minutes = Mathf.FloorToInt(curTime / 60F);
-				timeLabel.text = string.Format("Time: {0:0}:{1:00}", minutes, curTime - minutes * 60);
+				timeLabel.text = string.Format("Time: {00:0}:{1:00}", minutes, curTime - minutes * 60);
 				break;
 		}
 	}
