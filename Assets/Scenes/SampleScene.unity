@@ -328,6 +328,7 @@ MonoBehaviour:
   - {fileID: 3492271902857764135, guid: 54f3e527e0fe05c49ae5316afb40ba36, type: 3}
   - {fileID: 50312515328702637, guid: 834525b7c21a30049a7b36e5efb3bcb7, type: 3}
   - {fileID: 3957103303530225239, guid: df2351e3b956013459592b740b4adef1, type: 3}
+  gameOverText: {fileID: 1460112341}
 --- !u!4 &118764749
 Transform:
   m_ObjectHideFlags: 0

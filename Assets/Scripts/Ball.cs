@@ -35,7 +35,7 @@ public class Ball : MonoBehaviour
             default:
                 transform.position = new Vector2(paddle.position.x, paddle.position.y + .3f);   //keep the ball on the paddle and move it around
 
-                if (Input.GetButtonDown("Jump"))
+                if (Input.GetButtonDown("Jump") && !manager.GameFinished)
                 {
                     manager.ChangeMode(GameManager.Mode.Play);
                     body.AddForce(Vector2.up * speed);
@@ -65,7 +65,7 @@ public class Ball : MonoBehaviour
 		switch(other.tag)
 		{
             case "Bottom":
-                if (manager.CurrentMode != GameManager.Mode.GameEnd)   //Dont count multiball loses against your lives
+                if (!manager.GameFinished)   //Dont count multiball loses against your lives
                 {
                     if (manager.NumberBalls < 2)
                     {

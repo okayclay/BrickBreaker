@@ -25,7 +25,7 @@ public class Paddle : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (manager.CurrentMode != GameManager.Mode.GameEnd)
+        if (!manager.GameFinished)
         {
             float horizontal = Input.GetAxis("Horizontal");                             //get input from the input manager every frame
             transform.Translate(Vector2.right * horizontal * Time.deltaTime * speed);   //move the paddle in the direction that we pressed

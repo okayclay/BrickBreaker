@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
 	private float curTime;
 	int numBricks;
 	int numBalls = 1;
+	bool gameFinished = false;
 
 	[SerializeField]
 	GameObject gameOverPanel;
@@ -24,12 +25,15 @@ public class GameManager : MonoBehaviour
 	Text timeLabel;
 	[SerializeField]
 	Transform[] powerups;
+	[SerializeField]
+	Text gameOverText;
 
 	public Mode			CurrentMode {	get { return curMode; } }
 	public int			GetLives	{	get { return lives; } }
 	public int			GetScore	{	get { return score; } }
 	public  Transform[] Powerups	{	get { return powerups; } }
 	public int			NumberBalls {	get { return numBalls; } set { numBalls = value; } }
+	public bool			GameFinished {  get { return gameFinished; } }
 
 	public enum Mode
 	{
@@ -59,20 +63,19 @@ public class GameManager : MonoBehaviour
 		if (curMode == Mode.GameEnd)
 		{
 			if (lives < 1)
-				GameOver();
+				Finish("GAME OVER");
 			else if (numBricks < 1)
-				GameWon();
+				Finish("YOU WIN!");
 		}
 	}
 
-	void GameOver()
+	private void Finish(string title)
 	{
 		gameOverPanel.SetActive(true);
-	}
+		gameOverText.text = title;
 
-	void GameWon()
-	{
-
+		Time.timeScale = 0;
+		gameFinished = true;
 	}
 
 	public void BrickDestroyed(Transform brick)
@@ -127,10 +130,15 @@ public class GameManager : MonoBehaviour
 
 			default:
 				curTime += Time.deltaTime;
-				int minutes = Mathf.FloorToInt(curTime / 60F);
-				timeLabel.text = string.Format("Time: {00:0}:{1:00}", minutes, curTime - minutes * 60);
 				break;
 		}
+		UpdateTime();
+	}
+
+	private void UpdateTime()
+	{
+		int minutes = Mathf.FloorToInt(curTime / 60F);
+		timeLabel.text = string.Format("Time: {00:0}:{1:00}", minutes, curTime - minutes * 60);
 	}
 
 	public void UpdateLives(int newLifeAmount)
