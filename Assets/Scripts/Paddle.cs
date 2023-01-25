@@ -17,7 +17,7 @@ public class Paddle : MonoBehaviour
     void Start()
     {
         manager = GameObject.Find("GameManager").GetComponent<GameManager>();
-        Debug.Log("Game Manager found: " + (manager != null));
+     //   Debug.Log("Game Manager found: " + (manager != null));
 
         originalSpeed = speed;
     }

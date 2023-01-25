@@ -28,6 +28,7 @@ public class GameManager : MonoBehaviour
 	[SerializeField]
 	Text gameOverText;
 
+	//TODO: Double check play again button
 	public Mode			CurrentMode {	get { return curMode; } }
 	public int			GetLives	{	get { return lives; } }
 	public int			GetScore	{	get { return score; } }
@@ -46,18 +47,18 @@ public class GameManager : MonoBehaviour
 
 	void Start()
 	{
-		ChangeMode(Mode.Pause);
+		Time.timeScale = 1;
 		SetDefaultUI();
 
 		var temp = GameObject.FindGameObjectsWithTag("Brick");
 		numBricks = temp.Length;
-		Debug.Log(numBricks + " found");
 
 		gameOverPanel.SetActive(false);
 	}
 
 	public void ChangeMode(Mode newMode)
 	{
+		//Debug.Log("Changing mode to " + newMode);
 		curMode = newMode;
 
 		if (curMode == Mode.GameEnd)
@@ -102,6 +103,7 @@ public class GameManager : MonoBehaviour
 	
 	public void PlayAgain()
 	{
+		Debug.Log("Play again");
 		SceneManager.LoadScene("SampleScene");
 	}
 

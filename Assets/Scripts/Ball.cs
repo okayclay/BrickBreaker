@@ -39,6 +39,7 @@ public class Ball : MonoBehaviour
                 {
                     manager.ChangeMode(GameManager.Mode.Play);
                     body.AddForce(Vector2.up * speed);
+                   // Debug.Log("Play mode");
                 }
                 break;
 		}
@@ -47,11 +48,8 @@ public class Ball : MonoBehaviour
     void setUp()
 	{
         body = transform.GetComponent<Rigidbody2D>();
-        Debug.Log("Rigidbody Found: " + (body != null));
         paddle = GameObject.FindGameObjectWithTag("Paddle").transform;
-        Debug.Log("Paddle found: " + (paddle != null));
         manager = GameObject.Find("GameManager").GetComponent<GameManager>();
-        Debug.Log("Game Manager found: " + (manager != null));
     }
 
     void ReturnToPaddle()
