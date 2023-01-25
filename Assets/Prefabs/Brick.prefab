@@ -122,3 +122,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   points: 5
+  totalHits: 1
+  explosionParticle: {fileID: 570130714443410780, guid: 0fece97e0813ebe42ad59bc9c29b67b4,
+    type: 3}
+  hitImage: {fileID: 0}

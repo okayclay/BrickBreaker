@@ -79,11 +79,17 @@ public class GameManager : MonoBehaviour
 		gameFinished = true;
 	}
 
-	public void BrickDestroyed(Transform brick)
+	public IEnumerator BrickDestroyed(Transform brick)
 	{
 		numBricks--;
 		PowerupRandomizer(brick);
-		if(numBricks < 1)
+
+		Transform explosion = Instantiate(brick.GetComponent<Brick>().Explosion, brick.position, Quaternion.identity);
+		Destroy(brick.gameObject);  //no more brick
+		yield return new WaitForSeconds(2);
+		Destroy(explosion.gameObject);  //clean up explosion
+
+		if (numBricks < 1)
 		{
 			numBricks = 0;
 			ChangeMode(Mode.GameEnd);

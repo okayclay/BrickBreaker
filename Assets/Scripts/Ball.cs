@@ -9,8 +9,6 @@ public class Ball : MonoBehaviour
     GameManager manager;
     [SerializeField]
     float speed;
-    [SerializeField]
-    Transform explosionParticle;
 
     public float Speed {  get { return speed; } }
 
@@ -85,18 +83,14 @@ public class Ball : MonoBehaviour
 		switch(collision.gameObject.tag)
 		{
             case "Brick":
-                StartCoroutine(HitBrick(collision.transform));
+                HitBrick(collision.transform);
                 break;
 		}
 	}
 
-    IEnumerator HitBrick(Transform brick)
+    void HitBrick(Transform brick)
 	{
-        manager.BrickDestroyed(brick);
+        brick.GetComponent<Brick>().Hit();  //the brick was hit, some take more than 1 hit to destroy
         manager.UpdateScore(brick.GetComponent<Brick>().Points);
-        Transform explosion = Instantiate(explosionParticle, brick.position, Quaternion.identity);
-        Destroy(brick.gameObject);  //no more brick
-        yield return new WaitForSeconds(2);
-        Destroy(explosion.gameObject);  //clean up explosion
     }
 }
