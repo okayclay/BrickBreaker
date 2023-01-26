@@ -42,5 +42,6 @@ public class Brick : MonoBehaviour
             SpriteRenderer renderer = GetComponent<SpriteRenderer>();
             renderer.sprite = hitImage;
 		}
+        manager.UpdateBricks();
 	}
 }

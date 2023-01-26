@@ -37,7 +37,6 @@ public class Ball : MonoBehaviour
                 {
                     manager.ChangeMode(GameManager.Mode.Play);
                     body.AddForce(Vector2.up * speed);
-                   // Debug.Log("Play mode");
                 }
                 break;
 		}
@@ -83,7 +82,8 @@ public class Ball : MonoBehaviour
 		switch(collision.gameObject.tag)
 		{
             case "Brick":
-                HitBrick(collision.transform);
+                if(manager.CurrentMode == GameManager.Mode.Play)
+                    HitBrick(collision.transform);
                 break;
 		}
 	}

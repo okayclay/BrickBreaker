@@ -31,6 +31,8 @@ public class GameManager : MonoBehaviour
 	Text gameOverText;
 	[SerializeField]
 	GameObject[] levels;
+	[SerializeField]
+	Text brickLabel;
 
 	//TODO: 
 	public Mode			CurrentMode {	get { return curMode; } }
@@ -64,6 +66,7 @@ public class GameManager : MonoBehaviour
 	{
 		var temp = GameObject.FindGameObjectsWithTag("Brick");
 		numBricks = temp.Length;
+		UpdateBricks();
 	}
 
 	public void ChangeMode(Mode newMode)
@@ -77,7 +80,7 @@ public class GameManager : MonoBehaviour
 				Finish("GAME OVER");
 			else if (numBricks < 1)
 			{
-				NextLevel();
+				StartCoroutine( NextLevel() );
 			}
 		}
 	}
@@ -91,9 +94,9 @@ public class GameManager : MonoBehaviour
 		gameFinished = true;
 	}
 
-	private void NextLevel()
+	private IEnumerator NextLevel()
 	{
-		if (levelIndex > levels.Length)
+		if (levelIndex >= levels.Length)
 		{
 			Finish("YOU WIN!");	//no more levels, you win
 		}
@@ -102,8 +105,10 @@ public class GameManager : MonoBehaviour
 			GameObject prevLevel = curLevel;	//Store the current level elsewhere
 			curLevel = Instantiate(levels[levelIndex], curLevel.transform.position, Quaternion.identity);	//bring up the new level
 			Destroy(prevLevel); //destroy previous level
-			CountBricks();
+			yield return new WaitForSeconds(1.5f);
 			ChangeMode(Mode.Move);
+			levelIndex++;
+			CountBricks();
 		}
 	}
 
@@ -162,11 +167,20 @@ public class GameManager : MonoBehaviour
 				Time.timeScale = 0;
 				break;
 
+			case Mode.Move:
+				Time.timeScale = 1;	//just make sure the timer is going again after changing levels - K.Clay
+				break;
+
 			default:
 				curTime += Time.deltaTime;
 				break;
 		}
 		UpdateTime();
+	}
+
+	public void UpdateBricks()
+	{
+		brickLabel.text = "Bricks Left: " + numBricks;
 	}
 
 	private void UpdateTime()
