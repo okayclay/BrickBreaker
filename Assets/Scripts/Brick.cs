@@ -35,12 +35,12 @@ public class Brick : MonoBehaviour
         if(totalHits <= 0)
 		{
             totalHits = 0;
-            StartCoroutine(manager.BrickDestroyed(this.transform));
+            manager.BrickDestroyed(this.transform);
 		}
         else
 		{
-            SpriteRenderer s = GetComponent<SpriteRenderer>();
-            s.color = Color.yellow;
+            SpriteRenderer renderer = GetComponent<SpriteRenderer>();
+            renderer.sprite = hitImage;
 		}
 	}
 }
