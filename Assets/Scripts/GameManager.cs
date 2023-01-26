@@ -14,6 +14,8 @@ public class GameManager : MonoBehaviour
 	int numBricks;
 	int numBalls = 1;
 	bool gameFinished = false;
+	int levelIndex = 0;
+	GameObject curLevel;
 
 	[SerializeField]
 	GameObject gameOverPanel;
@@ -27,8 +29,10 @@ public class GameManager : MonoBehaviour
 	Transform[] powerups;
 	[SerializeField]
 	Text gameOverText;
+	[SerializeField]
+	GameObject[] levels;
 
-	//TODO: Double check play again button
+	//TODO: 
 	public Mode			CurrentMode {	get { return curMode; } }
 	public int			GetLives	{	get { return lives; } }
 	public int			GetScore	{	get { return score; } }
@@ -50,10 +54,16 @@ public class GameManager : MonoBehaviour
 		Time.timeScale = 1;
 		SetDefaultUI();
 
-		var temp = GameObject.FindGameObjectsWithTag("Brick");
-		numBricks = temp.Length;
+		CountBricks();
+		curLevel = GameObject.FindWithTag("Level");
 
 		gameOverPanel.SetActive(false);
+	}
+
+	private void CountBricks()
+	{
+		var temp = GameObject.FindGameObjectsWithTag("Brick");
+		numBricks = temp.Length;
 	}
 
 	public void ChangeMode(Mode newMode)
@@ -66,7 +76,9 @@ public class GameManager : MonoBehaviour
 			if (lives < 1)
 				Finish("GAME OVER");
 			else if (numBricks < 1)
-				Finish("YOU WIN!");
+			{
+				NextLevel();
+			}
 		}
 	}
 
@@ -79,12 +91,28 @@ public class GameManager : MonoBehaviour
 		gameFinished = true;
 	}
 
+	private void NextLevel()
+	{
+		if (levelIndex > levels.Length)
+		{
+			Finish("YOU WIN!");	//no more levels, you win
+		}
+		else
+		{
+			GameObject prevLevel = curLevel;	//Store the current level elsewhere
+			curLevel = Instantiate(levels[levelIndex], curLevel.transform.position, Quaternion.identity);	//bring up the new level
+			Destroy(prevLevel); //destroy previous level
+			CountBricks();
+			ChangeMode(Mode.Move);
+		}
+	}
+
 	public void BrickDestroyed(Transform brick)
 	{
 		numBricks--;
 		PowerupRandomizer(brick);
 
-		Transform explosion = Instantiate(brick.GetComponent<Brick>().Explosion, brick.position, Quaternion.identity);
+		Instantiate(brick.GetComponent<Brick>().Explosion, brick.position, Quaternion.identity);
 		Destroy(brick.gameObject);  //no more brick
 
 		if (numBricks < 1)
@@ -108,7 +136,7 @@ public class GameManager : MonoBehaviour
 	public void PlayAgain()
 	{
 		Debug.Log("Play again");
-		SceneManager.LoadScene("SampleScene");
+		SceneManager.LoadScene("Level 1");
 	}
 
 	public void Quit()
